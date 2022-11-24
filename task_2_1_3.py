@@ -221,5 +221,5 @@ class InputConnect:
         b.get_pdf()
 
 
-if __name__ == '__main__':
+def get_answer():
     InputConnect()
