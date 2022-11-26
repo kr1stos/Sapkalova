@@ -10,7 +10,7 @@ from openpyxl.styles import Border, Font, Side
 
 
 class Vacancy:
-    inRubles = {"KGS": 0.76, "BYR": 23.91, "GEL": 21.74, "EUR": 59.90, "AZN": 35.68,
+    inRubles = {"KGZ": 0.76, "BYR": 23.91, "GEL": 21.74, "EUR": 59.90, "AZN": 35.68,
                 "KZT": 0.13, "UAH": 1.64, "RUR": 1, "USD": 60.66, "UZS": 0.0055,
                 }
 
