@@ -10,11 +10,26 @@ from openpyxl.styles import Border, Font, Side
 
 
 class Vacancy:
+    """Класс для установки всех основных полей вакансии
+    Attributes:
+        name (str): Название вакансии
+        salaryTo (int): Верхняя граница вилки зарплат
+        salaryFrom (int): Нижняя граница вилки зарплат
+        salaryCurrency (str): Идентификатор валюты зарплат
+        salaryAverage (float): Средняя зарплата
+        areaName (str): Название региона
+        year (int): Год публикации вакансии
+        inRubles (dict): Словарь курса валют
+    """
     inRubles = {"KGZ": 0.76, "BYR": 23.91, "GEL": 21.74, "EUR": 59.90, "AZN": 35.68,
                 "KZT": 0.13, "UAH": 1.64, "RUR": 1, "USD": 60.66, "UZS": 0.0055,
                 }
 
     def __init__(self, vacancy):
+        """Инициализирует объект Vacancy
+        Args:
+            vacancy (dict): Информация об 1 вакансии, полученная в виде словаря из файла
+        """
         self.name = vacancy['name']
         self.salaryTo = int(float(vacancy['salary_to']))
         self.salaryFrom = int(float(vacancy['salary_from']))
@@ -25,12 +40,28 @@ class Vacancy:
 
 
 class DataSet:
+    """Класс отвечает за чтение и подготовку данных из CSV-файла
+    Attributes:
+        fileName (str): Название CSV-файла
+        vacancyName (str): Название профессии для статистики
+    """
     def __init__(self, file_name, vacancy_name):
+        """Инициализирует объект DataSet
+        Args:
+            file_name (str): Название CSV-файла
+            vacancy_name (str): Название профессии для статистики
+        """
         self.fileName = file_name
         self.vacancyName = vacancy_name
 
     @staticmethod
     def increment(dict, key, quantity):
+        """Добавляет данные в словарь
+        Args:
+            dict (dict): Словарь зарплат
+            key (int): Год публикации вакансии
+            quantity (list): Средняя зарплата
+        """
         if key in dict:
             dict[key] += quantity
         else:
@@ -38,12 +69,22 @@ class DataSet:
 
     @staticmethod
     def average(d):
+        """Считает по годам средние величины
+        Returns: Словарь средних величин по годам
+        Args:
+            dict: словарь по годам со статистической информацией
+        """
         dictionary = {}
         for key, values in d.items():
             dictionary[key] = int(sum(values)) / int(len(values))
         return dictionary
 
     def csv_reader(self):
+        """Делает словари из вакансий и парсит файл
+        Returns:
+            dict: Словари с информацией по вакансиям
+            генератор при помощи yield
+        """
         with open(self.fileName, mode='r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
             header = next(reader)
@@ -53,6 +94,10 @@ class DataSet:
                     yield dict(zip(header, i))
 
     def get_statistic(self):
+        """Формирует статистические данные
+        Returns:
+            tuple: Картеж 6 словарей со статистикой по городам и годам
+        """
         salary = {}
         salaryVacancy = {}
         salaryCity = {}
@@ -88,6 +133,15 @@ class DataSet:
 
     @staticmethod
     def print_statistic(statistics, statistics2, statistics3, statistics4, statistics5, statistics6):
+        """Выводит статистические данные
+        Args:
+            statistics (dict): Динамика уровня зарплат по годам
+            statistics2 (dict): Динамика количества вакансий по годам
+            statistics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            statistics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            statistics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            statistics6 (dict): Доля вакансий по городам (в порядке убывания)
+        """
         print('Динамика уровня зарплат по годам: {0}'.format(statistics))
         print('Динамика количества вакансий по годам: {0}'.format(statistics2))
         print('Динамика уровня зарплат по годам для выбранной профессии: {0}'.format(statistics3))
@@ -97,7 +151,28 @@ class DataSet:
 
 
 class Report:
+    """Класс для формировки файлов: exel, pdf, изображение
+    Attributes:
+        workbook (Workbook): экземпляр книги для эксель файла
+        vacancyName (str): Название профессии
+        statistics (dict): Динамика уровня зарплат по годам
+        statistics2 (dict): Динамика количества вакансий по годам
+        statistics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+        statistics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+        statistics5 (dict): Уровень зарплат по городам (в порядке убывания)
+        statistics6 (dict): Доля вакансий по городам (в порядке убывания)
+    """
     def __init__(self, vacancyName, statistics, statistics2, statistics3, statistics4, statistics5, statistics6):
+        """Инициализирует объект Report
+        Args:
+            vacancyName (str): Название профессии
+            statistics (dict): Динамика уровня зарплат по годам
+            statistics2 (dict): Динамика количества вакансий по годам
+            statistics3 (dict): Динамика уровня зарплат по годам для выбранной профессии
+            statistics4 (dict): Динамика количества вакансий по годам для выбранной профессии
+            statistics5 (dict): Уровень зарплат по городам (в порядке убывания)
+            statistics6 (dict): Доля вакансий по городам (в порядке убывания)
+        """
         self.workbook = Workbook()
         self.vacancyName = vacancyName
         self.statistics = statistics
@@ -108,6 +183,8 @@ class Report:
         self.statistics6 = statistics6
 
     def get_excel(self):
+        """Генерирует эксель файл и таблицы в нём с помощью библиотеки openpyxl, в папке с программой создаётся report.xlsx
+        """
         c = self.workbook.active
         c.title = 'Статистика по годам'
         c.append(['Год', 'Средняя зарплата', 'Средняя зарплата - ' + self.vacancyName, 'Количество вакансий',
@@ -160,6 +237,9 @@ class Report:
         self.workbook.save(filename='report.xlsx')
 
     def get_image(self):
+        """Генерирует изображение и диаграммы с помощью библиотек matplotlib, numpy, в папке с программой создаётся
+        graph.png
+        """
         fig, ((axes, axes2), (axes3, axes4)) = plt.subplots(nrows=2, ncols=2)
         bar = axes.bar(np.array(list(self.statistics.keys())) - 0.4, self.statistics.values(), width=0.4)
         bar2 = axes.bar(np.array(list(self.statistics.keys())), self.statistics3.values(), width=0.4)
@@ -193,6 +273,9 @@ class Report:
         plt.savefig('graph.png')
 
     def get_pdf(self):
+        """Генерирует pgf, содержащий таблицу и диаграммы, с помощью библиотек pathlib, pdfkit, jinja2, в папке создаётся
+        report.pdf
+        """
         statistic = []
         environment = Environment(loader=FileSystemLoader('.'))
         template = environment.get_template("html.html")
@@ -209,7 +292,15 @@ class Report:
 
 
 class InputConnect:
+    """Класс отвечает за обработку параметров вводимых пользователем:
+        фильтры, сортировка, диапазон вывода, требуемые столбцы, а также за печать таблицы на экран
+        Attributes:
+            fileName (str): Название файла
+            vacancyName (str): Название профессии для статистики
+    """
     def __init__(self):
+        """Запускает работу остальных классов и формирует статистику
+        """
         self.fileName = input('Введите название файла: ')
         self.vacancyName = input('Введите название профессии: ')
         a = DataSet(self.fileName, self.vacancyName)
@@ -222,4 +313,6 @@ class InputConnect:
 
 
 def get_answer():
+    """Запускает программу
+    """
     InputConnect()

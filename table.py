@@ -4,6 +4,16 @@ from prettytable import PrettyTable
 
 
 class Salary:
+    """Класс для представления зарплаты
+    Attributes:
+        salary_from (int): Нижняя граница вилки зарплат
+        salary_to (int): Верхняя граница вилки зарплат
+        salary_gross (str): Оклад указанный до вычета налогов
+        salary_currency (str): Идентификатор валюты оклада
+        salary_average (float): Средняя зарплата
+        ru_valuta (dict): Словарь расшифровки валют
+        currency_rub (dict): Словарь курса валют
+    """
     ru_valuta = {'AZN': 'Манаты', 'BYR': 'Белорусские рубли', 'EUR': 'Евро', 'GEL': 'Грузинский лари',
                  'KGS': 'Киргизский сом', 'KZT': 'Тенге', 'RUR': 'Рубли', 'UAH': 'Гривны', 'USD': 'Доллары',
                  'UZS': 'Узбекский сум'}
@@ -12,6 +22,10 @@ class Salary:
                     "UAH": 1.64, "USD": 60.66, "UZS": 0.0055}
 
     def __init__(self, vacancy):
+        """Инициализирует объект Salary
+        Args:
+            vacancy (dict): Информация об вакансии, полученная в виде словаря из файла
+        """
         self.salary_from = int(float(vacancy['salary_from']))
         self.salary_to = int(float(vacancy['salary_to']))
         self.salary_gross = 'Без вычета налогов' if vacancy['salary_gross'].lower() == 'true' else 'С вычетом налогов'
@@ -19,12 +33,36 @@ class Salary:
         self.salary_average = Salary.currency_rub[self.salary_currency] * (self.salary_from + self.salary_to) / 2
 
     def __str__(self):
+        """Форматирует данные о зарплате.
+        Returns:
+            str: данные о зарплате в виде 1 строки
+        """
         return '{0:,} - {1:,} ({2}) ({3})'.format(self.salary_from, self.salary_to,
                                                   Salary.ru_valuta[self.salary_currency],
                                                   self.salary_gross).replace(',', ' ')
 
 
 class Vacancy:
+    """Класс для представления вакансии
+    Attributes:
+        index (int): Индекс вакансии
+        name (str): Название вакансии
+        description (str): Описание вакансии
+        skills (str): Навыки
+        key_skills (str): Навыки сокращенные до 100 символов
+        skills_length (int): Кол-во символов в характеристике навыков
+        experience_id (str): Опыт работы
+        premium (str): Премиум-вакансия
+        employer_name (str): Компания
+        salary_class (Salary): Содержит информацию о зарплате
+        salary (str): Информация о зарплате в строчном виде
+        area_name (str): Регион
+        published (str): Место публикации
+        published_at (str): Время публикации
+        order (list): Список переменных
+        experience_weight_dictionary (dict): Словарь помощник для перевода опыта работы
+        ru_experience (dict): Словарь перевода опыта работы
+    """
     order = ['index', 'name', 'description', 'key_skills', 'experience_id', 'premium', 'employer_name', 'salary',
              'area_name', 'published_at']
     experience_weight_dictionary = {'Нет опыта': 1, 'От 1 года до 3 лет': 2, 'От 3 до 6 лет': 3, 'Более 6 лет': 4}
@@ -32,6 +70,10 @@ class Vacancy:
                      'moreThan6': 'Более 6 лет'}
 
     def __init__(self, vacancy):
+        """Инициализирует объект Vacancy
+         Args:
+            vacancy (dict): Информация об вакансии, полученная в виде словаря из файла
+        """
         self.index = 0
         self.name = self.clearHTML(vacancy['name'])
         self.description = self.shortener(self.clearHTML(vacancy['description']))
@@ -49,39 +91,82 @@ class Vacancy:
 
     @staticmethod
     def clearHTML(string):
+        """Удаляет теги и лишние пробелы
+        Returns:
+            str: Строка без тегов и лишних пробелов
+        """
         result = re.sub(r'<.*?>', '', string)
         result = re.sub(r'\s+', ' ', result)
         return result.strip()
 
     @staticmethod
     def shortener(string):
+        """Сокращает строку до 100 символов и в конец добавляет ...
+        Returns:
+            str: Строка из 103 символов с ...
+        """
         return string if len(string) <= 100 else string[:100] + '...'
 
     @property
     def salary_average(self):
+        """Берет среднюю зарплату из класса
+        Returns:
+            int: Средняя зарплата
+        """
         return self.salary_class.salary_average
 
     @property
     def salary_currency(self):
+        """Берет валюту зарплаты из класса
+        Returns:
+            str: Курс валюты
+        """
         return self.salary_class.salary_currency
 
     @property
     def salary_from(self):
+        """Берет нижнюю границу зарплаты из класса
+        Returns:
+            int: Нижняя граница зарплаты
+        """
         return self.salary_class.salary_from
 
     @property
     def salary_to(self):
+        """Берет верхнюю границу зарплаты из класса
+        Returns:
+            int: Верхняя граница зарплаты
+        """
         return self.salary_class.salary_to
 
     @property
     def experience_weight(self):
+        """Задает число(вес) для опыта работы
+        Returns:
+            int: Вес опыта работы
+        """
         return self.experience_weight_dictionary[self.experience_id]
 
     def get_list(self):
+        """Делает из данных лист
+        Returns:
+            list: Данные о вакансии
+        """
         return [getattr(self, key) for key in self.order]
 
 
 class DataSet:
+    """Обрабатывает и считывает данные файла
+    Attributes:
+        file_name (str): Название файла
+        filter_param (str): Параметр фильтрации
+        sort_param (str): Параметр сортировки
+        sort_reverse (str): Порядок сортировки
+        sort_range (str): Диапазон вывода
+        vacancies_objects (list): Лист с вакансиями
+        ru_dictionary (dict): Словарь с переводом
+        conditions_sort (dict): Словарь с характеристиками для вакансии для сортировки
+    """
     ru_dictionary = {'Описание': 'description', 'Навыки': 'skills_length', 'Оклад': 'salary_average',
                      'Дата публикации вакансии': 'published', 'Опыт работы': 'experience_weight',
                      'Премиум-вакансия': 'premium',
@@ -100,6 +185,14 @@ class DataSet:
                        'Компания': lambda vacancy, value: vacancy.employer_name == value}
 
     def __init__(self, file_name, filter_param, sort_param, sort_reverse, sort_range):
+        """Инициализирует объект DataSet
+        Args:
+             file_name (str): Название файла
+            filter_param (str): Параметр фильтрации
+            sort_param (str): Параметр сортировки
+            sort_reverse (str): Порядок сортировки
+            sort_range (str): Диапазон вывода
+        """
         self.file_name = file_name
         self.filter_param = filter_param
         self.sort_param = sort_param
@@ -108,6 +201,10 @@ class DataSet:
         self.vacancies_objects = []
 
     def csv_reader(self):
+        """Считывает файл, записывает данные в лист
+        Returns:
+            list: Данные файла в виде словарей в листе
+        """
         h = []
         with open(self.file_name, mode='r', encoding='utf-8-sig') as file:
             reader = csv.reader(file)
@@ -125,9 +222,15 @@ class DataSet:
             exit()
 
     def get_rows(self):
+        """Объединяет данные о вакансиях в list
+        Returns:
+            list: Данные вакансий
+        """
         return [vacancy.get_list() for vacancy in self.vacancies_objects]
 
     def filter_rows(self):
+        """Фильтрует вакансии
+        """
         if len(self.filter_param) == 0:
             return
         self.vacancies_objects = list(
@@ -135,6 +238,8 @@ class DataSet:
                    self.vacancies_objects))
 
     def sort_rows(self):
+        """Сортирует вакансии в нужном порядке
+        """
         if self.sort_param != '':
             self.vacancies_objects.sort(key=lambda a: getattr(a, DataSet.ru_dictionary[self.sort_param]),
                                         reverse=self.sort_reverse)
@@ -142,6 +247,10 @@ class DataSet:
             self.vacancies_objects.reverse()
 
     def get_range(self):
+        """Сокращает данные о вакансиях до нужного диапазона
+        Returns:
+            list: Данные вакансий
+        """
         vacancies_temp = []
         length = len(self.sort_range)
         for index, vacancy in enumerate(self.vacancies_objects):
@@ -153,10 +262,24 @@ class DataSet:
 
 
 class InputConnect:
+    """Отвечает за обработку параметров вводимых пользователем: фильтры, сортировка, диапазон вывода,
+    требуемые столбцы, а также за печать таблицы на экран
+    Attributes:
+        errors (list): Ошибки
+        file_name (str): Имя файла
+        filter_param (str): Параметр фильтрации
+        sort_param (str): Параметр сортировки
+        sort_reverse (bool): Определяет порядок сортировки
+        sort_range (list): Диапозон вывода
+        table_fields (list): Требуемые столбцы
+        table_h (list): Список со столбцами
+    """
     table_h = ['№', 'Название', 'Описание', 'Навыки', 'Опыт работы', 'Премиум-вакансия', 'Компания', 'Оклад',
                'Название региона', 'Дата публикации вакансии']
 
     def __init__(self):
+        """Инициализирует объект InputConnect
+        """
         self.errors = []
         self.file_name = input('Введите название файла: ')
         self.filter_param = self.parse_filter_param(input('Введите параметр фильтрации: '))
@@ -181,6 +304,10 @@ class InputConnect:
             print(table.get_string(fields=self.table_fields))
 
     def parse_filter_param(self, filter_param):
+        """Обрабатывает ввод пользователя и выводит ошибку, если данные введены некорректно.
+        Returns:
+            list: Параметры фильтрации
+        """
         if filter_param == '':
             return []
         if ': ' not in filter_param:
@@ -193,22 +320,40 @@ class InputConnect:
         return filter_param
 
     def parse_sort_reverse(self, sort_reverse):
+        """Обрабатывает ввод пользователя и выводит ошибку, если данные введены некорректно
+        Returns:
+            bool: Вид порядка сортировки
+        """
         if sort_reverse not in ('', 'Да', 'Нет'):
             self.errors.append('Порядок сортировки задан некорректно')
         return True if sort_reverse == 'Да' else False
 
     def parse_sort_param(self, sort_param):
+        """Обрабатывает ввод пользователя и выводит ошибку, если данные введены некорректно
+        Returns:
+            list: Параметры сортировки
+        """
         if sort_param not in InputConnect.table_h + ['']:
             self.errors.append('Параметр сортировки некорректен')
         return sort_param
 
     def parse_sort_range(self, sort_range):
+        """Обрабатывает ввод пользователя и выводит ошибку, если данные введены некорректно
+        Returns:
+            list: Диапазон сортировки
+        """
         return [] if sort_range == '' else [int(limit) - 1 for limit in sort_range.split()]
 
     def parse_table_fields(self, table_fields):
+        """Обрабатывает ввод пользователя и выводит ошибку, если данные введены некорректно
+        Returns:
+            list: Заголовки столбцов
+        """
         return InputConnect.table_h if table_fields == '' else ['№'] + [a for a in table_fields.split(', ') if
                                                                         a in InputConnect.table_h]
 
 
 def get_answer():
+    """Запускает программу
+    """
     InputConnect()
