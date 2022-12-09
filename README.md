@@ -11,4 +11,5 @@
 
 3.2.3
 - ![image](https://user-images.githubusercontent.com/104152574/206765765-6d47a50c-0c2d-4958-a09d-81f33df5a787.png)
+
 Значит оставляю решение с Concurrent futures.
