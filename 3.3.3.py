@@ -29,3 +29,4 @@ for url in urls:
                 continue
 df.to_csv("Vacancies_by_HH.csv", index=False)
 print(df)
+
