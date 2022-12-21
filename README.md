@@ -16,3 +16,6 @@
 
 3.3.1
 - ![image](https://user-images.githubusercontent.com/104152574/208957409-8e2944e0-03fd-4598-8f5c-269e1edcd7d9.png)
+
+3.3.2
+- ![image](https://user-images.githubusercontent.com/104152574/208960742-2d5663a4-5b95-4def-b096-1fae90eb7a75.png)
