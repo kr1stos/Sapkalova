@@ -20,10 +20,10 @@ for i in range(0, len(month)):
     currency1 = currency.loc[currency['CharCode'].isin(['BYN'] + z)]
     BYR = float(currency1.loc[currency1['CharCode'].isin(['BYR', 'BYN'])]['Value'].values[0].replace(',', '.')) / \
           (currency1.loc[currency1['CharCode'].isin(['BYR', 'BYN'])]['Nominal'].values[0])
-    EUR = float(currency1.loc[currency1['CharCode'] == 'EUR']['Value'].values[0].replace(',', '.')) / \
-          (currency1.loc[currency1['CharCode'] == 'EUR']['Nominal'].values[0])
     KZT = float(currency1.loc[currency1['CharCode'] == 'KZT']['Value'].values[0].replace(',', '.')) / \
           (currency1.loc[currency1['CharCode'] == 'KZT']['Nominal'].values[0])
+    EUR = float(currency1.loc[currency1['CharCode'] == 'EUR']['Value'].values[0].replace(',', '.')) / \
+          (currency1.loc[currency1['CharCode'] == 'EUR']['Nominal'].values[0])
     USD = float(currency1.loc[currency1['CharCode'] == 'USD']['Value'].values[0].replace(',', '.')) / \
           (currency1.loc[currency1['CharCode'] == 'USD']['Nominal'].values[0])
     UAH = float(currency1.loc[currency1['CharCode'] == 'UAH']['Value'].values[0].replace(',', '.')) / \
