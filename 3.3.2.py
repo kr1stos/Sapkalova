@@ -24,9 +24,9 @@ def fill_df(df, currencies):
 def calc_year_stat_mp(fileName, jobName, q, currencies):
     df = pd.read_csv(fileName)
     df = fill_df(df, currencies)
-    data_job = df[df['name'].str.contains(jobName, case=False)]
-    q.put([int(df['published_at'].values[0][:4]), df.shape[0], math.floor(df['salary'].mean()), data_job.shape[0],
-           math.floor(data_job['salary'].mean()), df])
+    job = df[df['name'].str.contains(jobName, case=False)]
+    q.put([int(df['published_at'].values[0][:4]), df.shape[0], math.floor(df['salary'].mean()), job.shape[0],
+           math.floor(job['salary'].mean()), df])
 
 
 def get_salary(x, currencies):
