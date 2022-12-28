@@ -60,7 +60,7 @@ class Report:
              'keys_1_area': list(dicts_by_area[1].keys()), 'values_1_area': list(dicts_by_area[1].values())})
         options = {'enable-local-file-access': None}
         config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
-        pdfkit.from_string(pdf_template, 'report.pdf', configuration=config, options=options)
+        pdfkit.from_string(pdf_template, '3.4.3..pdf', configuration=config, options=options)
 
     @staticmethod
     def generate_image(vac_name, region, dicts_by_area, dicts_by_year, vac_with_others):
@@ -118,7 +118,7 @@ dataframe = pd.read_csv(file)
 dataframe["years"] = dataframe["published_at"].apply(lambda date: int(".".join(date[:4].split("-"))))
 years = list(dataframe["years"].unique())
 salaries_areas, vacancies_areas, inp_vacancy_salary, inp_vacancy_count = {}, {}, {}, {}
-df_date = pd.read_csv("CB_Currency.csv")
+df_date = pd.read_csv("currencies.csv")
 dataframe["salary"] = dataframe.apply(lambda row: get_salary(row["salary_from"], row["salary_to"],
                                                              row["salary_currency"],
                                                              row["published_at"][:7].split("-")), axis=1)
@@ -127,6 +127,7 @@ dataframe["count"] = dataframe.groupby("area_name")['area_name'].transform("coun
 df_norm = dataframe[dataframe['count'] >= 0.01 * vacancies]
 cities = list(df_norm["area_name"].unique())
 others = len(dataframe[dataframe['count'] < 0.01 * vacancies]) / vacancies
+
 for city in cities:
     df_s = df_norm[df_norm['area_name'] == city]
     salaries_areas[city] = int(df_s['salary'].mean())
