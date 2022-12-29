@@ -24,7 +24,7 @@ def get_salary(row):
 
 currencies_col_id = {"BYR": 1, "EUR": 2, "KZT": 3, "UAH": 4, "USD": 5}
 df = pd.read_csv("vacancies_dif_currencies.csv")
-con = sqlite3.connect("cur.sqlite")
+con = sqlite3.connect("currencies.sqlite")
 cur = con.cursor()
 df["published_at"] = df["published_at"].apply(lambda date: date[:7])
 df['salary'] = df.apply(lambda x: get_salary(x), axis=1)
