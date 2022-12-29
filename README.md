@@ -22,3 +22,6 @@
 
 3.3.3
 - ![image](https://user-images.githubusercontent.com/104152574/208971490-702b71a7-0bd3-43ef-8077-a1f61fadc68c.png)
+
+3.5.2
+- ![image](https://user-images.githubusercontent.com/104152574/209990989-76744849-6a27-4a85-abb1-93024eb65dfd.png)
